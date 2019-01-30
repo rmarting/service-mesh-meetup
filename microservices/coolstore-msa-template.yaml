@@ -1,0 +1,646 @@
+apiVersion: v1
+kind: Template
+labels:
+  demo: coolstore-msa
+  place: service-mesh-meetup
+metadata:
+  annotations:
+    description: CoolStore demo microservices application template (Service Mesh)
+    iconClass: icon-java
+    tags: microservice,widlfly-swarm,spring-boot,vert.x
+  name: coolstore-msa.yaml
+objects:
+- apiVersion: v1
+  groupNames: null
+  kind: RoleBinding
+  metadata:
+    name: default_edit
+  roleRef:
+    name: view
+  subjects:
+  - kind: ServiceAccount
+    name: default
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      fabric8.io/iconUrl: img/icons/spring-boot.svg
+    labels:
+      app: catalog
+      group: com.redhat.cloudnative
+      provider: fabric8
+      version: 1.0.0-SNAPSHOT
+    name: catalog
+  spec:
+    replicas: 1
+    selector:
+      app: catalog
+      group: com.redhat.cloudnative
+      provider: fabric8
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 3600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          fabric8.io/iconUrl: img/icons/spring-boot.svg
+        labels:
+          app: catalog
+          group: com.redhat.cloudnative
+          provider: fabric8
+          version: 1.0.0-SNAPSHOT
+      spec:
+        containers:
+        - env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: catalog
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: spring-boot
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 9779
+            name: prometheus
+            protocol: TCP
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/break/status
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - spring-boot
+        from:
+          kind: ImageStreamTag
+          name: catalog:latest
+      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      fabric8.io/iconUrl: img/icons/vertx.svg
+    labels:
+      app: gateway
+      group: com.redhat.cloudnative
+      provider: fabric8
+      version: 1.0.0-SNAPSHOT
+    name: gateway
+  spec:
+    replicas: 1
+    selector:
+      app: gateway
+      group: com.redhat.cloudnative
+      provider: fabric8
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 3600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          fabric8.io/iconUrl: img/icons/vertx.svg
+        labels:
+          app: gateway
+          group: com.redhat.cloudnative
+          provider: fabric8
+          version: 1.0.0-SNAPSHOT
+      spec:
+        containers:
+        - env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          image: gateway
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: vertx
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 9779
+            name: prometheus
+            protocol: TCP
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - vertx
+        from:
+          kind: ImageStreamTag
+          name: gateway:latest
+      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: inventory
+      group: com.redhat.cloudnative
+      provider: fabric8
+      version: 1.0.0-SNAPSHOT
+    name: inventory
+  spec:
+    replicas: 1
+    selector:
+      app: inventory
+      group: com.redhat.cloudnative
+      provider: fabric8
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 3600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          fabric8.io/iconUrl: img/icons/wildfly.svg
+        labels:
+          app: inventory
+          group: com.redhat.cloudnative
+          provider: fabric8
+          version: 1.0.0-SNAPSHOT
+      spec:
+        containers:
+        - env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: GC_MAX_METASPACE_SIZE
+            value: "300"
+          image: inventory
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /node
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: wildfly-swarm
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 9779
+            name: prometheus
+            protocol: TCP
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/break/status
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - wildfly-swarm
+        from:
+          kind: ImageStreamTag
+          name: inventory:latest
+      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: web-ui
+      version: 1.0.0-SNAPSHOT
+    name: web-ui
+  spec:
+    replicas: 1
+    selector:
+      app: web-ui
+      deploymentconfig: web-ui
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        labels:
+          app: web-ui
+          version: 1.0.0-SNAPSHOT
+          deploymentconfig: web-ui
+      spec:
+        containers:
+        - image: web-ui
+          name: web-ui
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          resources: {}
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - web-ui
+        from:
+          kind: ImageStreamTag
+          name: web-ui:latest
+      type: ImageChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: catalog
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: catalog-s2i
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: catalog:latest
+    source:
+      contextDir: microservices/catalog-spring-boot
+      git:
+        ref: ${GIT_REF}
+        uri: ${GIT_URI}
+      type: Git
+    strategy:
+      sourceStrategy:
+        env:
+        - name: MAVEN_ARGS
+          value: package -DskipTests -Dfabric8.skip -e -B -Pearly-access-repo
+        from:
+          kind: DockerImage
+          name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5-14
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: gateway
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: gateway-s2i
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: gateway:latest
+    source:
+      contextDir: microservices/gateway-vertx
+      git:
+        ref: ${GIT_REF}
+        uri: ${GIT_URI}
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5-14
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      app: inventory
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: inventory-s2i
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: inventory:latest
+    source:
+      contextDir: microservices/inventory-wildfly-swarm
+      git:
+        ref: ${GIT_REF}
+        uri: ${GIT_URI}
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:1.5-14
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    labels:
+      build: web-ui
+    name: web-ui
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: web-ui:latest
+    source:
+      contextDir: microservices/web-nodejs
+      git:
+        ref: ${GIT_REF}
+        uri: ${GIT_URI}
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: nodejs:8
+          namespace: ${IMAGE_STREAM_NAMESPACE}
+      type: Source
+    triggers:
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: catalog
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: catalog
+  spec:
+    tags:
+    - name: latest
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: gateway
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: gateway
+  spec:
+    tags:
+    - name: latest
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      app: inventory
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: inventory
+  spec:
+    tags:
+    - name: latest
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: web-ui
+    name: nodejs-8-rhel7
+  spec:
+    tags:
+    - name: latest
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    labels:
+      build: web-ui
+    name: web-ui
+  spec:
+    tags:
+    - name: latest
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: catalog
+      expose: "true"
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: catalog
+  spec:
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: catalog
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: gateway
+      expose: "true"
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: gateway
+  spec:
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: gateway
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      app: inventory
+      expose: "true"
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+    name: inventory
+  spec:
+    port:
+      targetPort: 8080
+    to:
+      kind: Service
+      name: inventory
+- apiVersion: v1
+  kind: Route
+  metadata:
+    labels:
+      expose: "true"
+      group: com.redhat.cloudnative
+      version: 1.0.0-SNAPSHOT
+      app: web-ui
+    name: web-ui
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: web-ui
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: catalog
+      expose: "true"
+      group: com.redhat.cloudnative
+      provider: fabric8
+      version: 1.0.0-SNAPSHOT
+    name: catalog
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: catalog
+      group: com.redhat.cloudnative
+      provider: fabric8
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: gateway
+      expose: "true"
+      group: com.redhat.cloudnative
+      provider: fabric8
+      version: 1.0.0-SNAPSHOT
+    name: gateway
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: gateway
+      group: com.redhat.cloudnative
+      provider: fabric8
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: inventory
+      expose: "true"
+      group: com.redhat.cloudnative
+      provider: fabric8
+      version: 1.0.0-SNAPSHOT
+    name: inventory
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: inventory
+      group: com.redhat.cloudnative
+      provider: fabric8
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      app: web-ui
+      version: 1.0.0-SNAPSHOT
+    name: web-ui
+  spec:
+    ports:
+    - name: http
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      app: web-ui
+      deploymentconfig: web-ui
+parameters:
+- description: Git source URI for application
+  displayName: Git source repository
+  name: GIT_URI
+  required: true
+  value: https://github.com/rmarting/service-mesh-meetup
+- displayName: Git branch/tag reference
+  name: GIT_REF
+  required: true
+  value: master
+- description: Namespace in which the ImageStreams for Red Hat Middleware images are installed. These ImageStreams are normally installed in the openshift namespace. You should only need to modify this if you've installed the ImageStreams in a different namespace/project.
+  displayName: ImageStream Namespace
+  value: openshift
+  name: IMAGE_STREAM_NAMESPACE
+  required: true
