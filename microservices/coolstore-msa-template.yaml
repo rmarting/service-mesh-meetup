@@ -107,93 +107,6 @@ objects:
           kind: ImageStreamTag
           name: catalog:latest
       type: ImageChange
-#- apiVersion: v1
-#  kind: DeploymentConfig
-#  metadata:
-#    annotations:
-#      fabric8.io/iconUrl: img/icons/spring-boot.svg
-#    labels:
-#      app: catalog
-#      group: com.redhat.cloudnative
-#      provider: fabric8
-#      version: 2.0.0
-#    name: catalog-v2
-#  spec:
-#    replicas: 1
-#    selector:
-#      app: catalog
-#      group: com.redhat.cloudnative
-#      provider: fabric8
-#    strategy:
-#      resources: {}
-#      rollingParams:
-#        intervalSeconds: 1
-#        maxSurge: 25%
-#        maxUnavailable: 25%
-#        timeoutSeconds: 3600
-#        updatePeriodSeconds: 1
-#      type: Rolling
-#    template:
-#      metadata:
-#        annotations:
-#          fabric8.io/iconUrl: img/icons/spring-boot.svg
-#          sidecar.istio.io/inject: "false"
-#        labels:
-#          app: catalog
-#          group: com.redhat.cloudnative
-#          provider: fabric8
-#          version: 2.0.0
-#      spec:
-#        containers:
-#        - env:
-#          - name: KUBERNETES_NAMESPACE
-#            valueFrom:
-#              fieldRef:
-#                apiVersion: v1
-#                fieldPath: metadata.namespace
-#          image: catalog
-#          livenessProbe:
-#            failureThreshold: 3
-#            httpGet:
-#              path: /health
-#              port: 8080
-#              scheme: HTTP
-#            initialDelaySeconds: 180
-#            periodSeconds: 10
-#            successThreshold: 1
-#            timeoutSeconds: 1
-#          name: spring-boot
-#          ports:
-#          - containerPort: 8080
-#            name: http
-#            protocol: TCP
-#          - containerPort: 9779
-#            name: prometheus
-#            protocol: TCP
-#          - containerPort: 8778
-#            name: jolokia
-#            protocol: TCP
-#          readinessProbe:
-#            failureThreshold: 3
-#            httpGet:
-#              path: /api/break/status
-#              port: 8080
-#              scheme: HTTP
-#            initialDelaySeconds: 10
-#           periodSeconds: 10
-#            successThreshold: 1
-#            timeoutSeconds: 1
-#          resources: {}
-#    triggers:
-#    - type: ConfigChange
-#    - imageChangeParams:
-#        automatic: true
-#        containerNames:
-#        - spring-boot
-#        from:
-#          kind: ImageStreamTag
-#          name: catalog:latest
-#      type: ImageChange
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -368,93 +281,93 @@ objects:
           kind: ImageStreamTag
           name: inventory:latest
       type: ImageChange
-#- apiVersion: v1
-#  kind: DeploymentConfig
-#  metadata:
-#    labels:
-#      app: inventory
-#      group: com.redhat.cloudnative
-#      provider: fabric8
-#      version: 2.0.0
-#    name: inventory-v2
-#  spec:
-#    replicas: 1
-#    selector:
-#      app: inventory
-#      group: com.redhat.cloudnative
-#      provider: fabric8
-#    strategy:
-#      resources: {}
-#      rollingParams:
-#        intervalSeconds: 1
-#        maxSurge: 25%
-#        maxUnavailable: 25%
-#        timeoutSeconds: 3600
-#        updatePeriodSeconds: 1
-#      type: Rolling
-#    template:
-#      metadata:
-#        annotations:
-#          fabric8.io/iconUrl: img/icons/wildfly.svg
-#          sidecar.istio.io/inject: "false"
-#        labels:
-#          app: inventory
-#          group: com.redhat.cloudnative
-#          provider: fabric8
-#          version: 2.0.0
-#      spec:
-#        containers:
-#        - env:
-#          - name: KUBERNETES_NAMESPACE
-#            valueFrom:
-#              fieldRef:
-#                apiVersion: v1
-#                fieldPath: metadata.namespace
-#          - name: GC_MAX_METASPACE_SIZE
-#            value: "300"
-#          image: inventory
-#          livenessProbe:
-#            failureThreshold: 3
-#            httpGet:
-#              path: /node
-#              port: 8080
-#              scheme: HTTP
-#            initialDelaySeconds: 180
-#            periodSeconds: 10
-#            successThreshold: 1
-#            timeoutSeconds: 1
-#          name: wildfly-swarm
-#          ports:
-#          - containerPort: 8080
-#            name: http
-#            protocol: TCP
-#          - containerPort: 9779
-#            name: prometheus
-#            protocol: TCP
-#          - containerPort: 8778
-#            name: jolokia
-#            protocol: TCP
-#          readinessProbe:
-#            failureThreshold: 3
-#            httpGet:
-#              path: /api/break/status
-#              port: 8080
-#              scheme: HTTP
-#            initialDelaySeconds: 10
-#            periodSeconds: 10
-#            successThreshold: 1
-#            timeoutSeconds: 1
-#          resources: {}
-#    triggers:
-#    - type: ConfigChange
-#    - imageChangeParams:
-#        automatic: true
-#        containerNames:
-#        - wildfly-swarm
-#        from:
-#          kind: ImageStreamTag
-#          name: inventory:latest
-#      type: ImageChange
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    labels:
+      app: inventory
+      group: com.redhat.cloudnative
+      provider: fabric8
+      version: 2.0.0
+    name: inventory-v2
+  spec:
+    replicas: 1
+    selector:
+      app: inventory
+      group: com.redhat.cloudnative
+      provider: fabric8
+    strategy:
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 3600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          fabric8.io/iconUrl: img/icons/wildfly.svg
+          sidecar.istio.io/inject: "true"
+        labels:
+          app: inventory
+          group: com.redhat.cloudnative
+          provider: fabric8
+          version: 2.0.0
+      spec:
+        containers:
+        - env:
+          - name: KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.namespace
+          - name: GC_MAX_METASPACE_SIZE
+            value: "300"
+          image: inventory
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /node
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 180
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: wildfly-swarm
+          ports:
+          - containerPort: 8080
+            name: http
+            protocol: TCP
+          - containerPort: 9779
+            name: prometheus
+            protocol: TCP
+          - containerPort: 8778
+            name: jolokia
+            protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /api/break/status
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - wildfly-swarm
+        from:
+          kind: ImageStreamTag
+          name: inventory:latest
+      type: ImageChange
 - apiVersion: v1
   kind: DeploymentConfig
   metadata:
@@ -679,7 +592,6 @@ objects:
       app: catalog
       expose: "true"
       group: com.redhat.cloudnative
-      version: 1.0.0
     name: catalog
   spec:
     port:
@@ -694,7 +606,6 @@ objects:
       app: gateway
       expose: "true"
       group: com.redhat.cloudnative
-      version: 1.0.0
     name: gateway
   spec:
     port:
@@ -709,7 +620,6 @@ objects:
       app: inventory
       expose: "true"
       group: com.redhat.cloudnative
-      version: 1.0.0
     name: inventory
   spec:
     port:
@@ -740,7 +650,6 @@ objects:
       expose: "true"
       group: com.redhat.cloudnative
       provider: fabric8
-      version: 1.0.0
     name: catalog
   spec:
     ports:
@@ -752,7 +661,6 @@ objects:
       app: catalog
       group: com.redhat.cloudnative
       provider: fabric8
-      version: 1.0.0
 - apiVersion: v1
   kind: Service
   metadata:
@@ -761,7 +669,6 @@ objects:
       expose: "true"
       group: com.redhat.cloudnative
       provider: fabric8
-      version: 1.0.0
     name: gateway
   spec:
     ports:
@@ -781,7 +688,6 @@ objects:
       expose: "true"
       group: com.redhat.cloudnative
       provider: fabric8
-      version: 1.0.0
     name: inventory
   spec:
     ports:
@@ -793,7 +699,6 @@ objects:
       app: inventory
       group: com.redhat.cloudnative
       provider: fabric8
-      version: 1.0.0
 - apiVersion: v1
   kind: Service
   metadata:
