@@ -57,13 +57,13 @@ angular.module("app")
 		}
 
 		cart.shoppingCartItemList = [];
-		$http({
-			   method: 'GET',
-			   url: baseUrl + '/' + cartId
-		   }).then(function(resp) {
-			    cart = resp.data;
-		   }, function(err) {
-		});
+		//$http({
+		//	   method: 'GET',
+		//	   url: baseUrl + '/' + cartId
+		//   }).then(function(resp) {
+		//	    cart = resp.data;
+		//   }, function(err) {
+		//});
 
 	};
 
