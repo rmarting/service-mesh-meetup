@@ -38,11 +38,11 @@ public class InventoryResource {
 			this.breakFixService.process();
 		} catch (RuntimeException re) {
 			inventory = null; // No data
-			if ((new Random()).nextInt(10) % 2 == 0) {
+			//if ((new Random()).nextInt(10) % 2 == 0) {
 				httpStatus = Response.Status.INTERNAL_SERVER_ERROR;
-			} else {
-				httpStatus = Response.Status.NOT_FOUND;
-			}
+			//} else {
+			//	httpStatus = Response.Status.NOT_FOUND;
+			//}
 		}
 
 		if (inventory == null) {

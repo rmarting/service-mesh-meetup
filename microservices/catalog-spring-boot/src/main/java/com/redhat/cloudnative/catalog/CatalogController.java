@@ -40,11 +40,11 @@ public class CatalogController {
         	breakFixService.process();
         } catch (RuntimeException re) {
         	result = new ArrayList<Product>(); // No data
-        	if ((new Random()).nextInt(10) % 2 == 0) {
+        	//if ((new Random()).nextInt(10) % 2 == 0) {
         		httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-        	} else {
-        		httpStatus = HttpStatus.NOT_FOUND;
-        	}
+        	//} else {
+        	//	httpStatus = HttpStatus.NOT_FOUND;
+        	//}
         }
                 
         return new ResponseEntity<>(result, httpStatus);
