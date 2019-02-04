@@ -14,9 +14,10 @@ minishift config set vm-driver ${MINISHIFT_VM_DRIVER} ## or virtualbox, or kvm, 
 minishift config set disk-size ${MINISHIFT_DISK_SIZE} # extra disk size for the vm
 minishift config set image-caching true
 minishift addon enable admin-user
-minishift addon enable anyuid
+#minishift addon enable anyuid
 minishift addon disable xpaas
 
-minishift start --openshift-version v3.11.43 --skip-startup-checks --skip-registration
+#minishift start --openshift-version v3.11.43 --skip-startup-checks --skip-registration
+minishift start --skip-startup-checks --skip-registration; sleep 10; minishift addon apply anyuid
 
 minishift ssh -- sudo setenforce 0

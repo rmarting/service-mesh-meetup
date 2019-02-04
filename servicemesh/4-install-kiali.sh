@@ -7,11 +7,11 @@
 curl https://raw.githubusercontent.com/kiali/kiali/${KIALI_VERSION}/deploy/openshift/kiali-configmap.yaml | \
   VERSION_LABEL=${KIALI_VERSION} \
   JAEGER_URL=${JAEGER_URL}  \
-  GRAFANA_URL=${GRAFANA_URL} envsubst | oc create -n istio-system -f -
+  GRAFANA_URL=${GRAFANA_URL} /usr/local/Cellar/gettext/0.19.8.1/bin/envsubst | oc create -n istio-system -f -
 
 # Installs Kiali's secrets
 curl https://raw.githubusercontent.com/kiali/kiali/${KIALI_VERSION}/deploy/openshift/kiali-secrets.yaml | \
-  VERSION_LABEL=${KIALI_VERSION} envsubst | oc create -n istio-system -f -
+  VERSION_LABEL=${KIALI_VERSION} /usr/local/Cellar/gettext/0.19.8.1/bin/envsubst | oc create -n istio-system -f -
 
 # Deploys Kiali to the cluster
 curl https://raw.githubusercontent.com/kiali/kiali/${KIALI_VERSION}/deploy/openshift/kiali.yaml | \
@@ -20,4 +20,4 @@ curl https://raw.githubusercontent.com/kiali/kiali/${KIALI_VERSION}/deploy/opens
   IMAGE_VERSION=${KIALI_VERSION}  \
   NAMESPACE=istio-system  \
   VERBOSE_MODE=4  \
-  IMAGE_PULL_POLICY_TOKEN="imagePullPolicy: Always" envsubst | oc create -n istio-system -f -
+  IMAGE_PULL_POLICY_TOKEN="imagePullPolicy: Always" /usr/local/Cellar/gettext/0.19.8.1/bin/envsubst | oc create -n istio-system -f -

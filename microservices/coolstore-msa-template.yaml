@@ -309,6 +309,9 @@ objects:
         containers:
         - image: web-ui
           name: web-ui
+          env:
+            - name: COOLSTORE_GW_ENDPOINT
+              value: ${COOLSTORE_GW_ENDPOINT}
           ports:
           - containerPort: 8080
             name: http

@@ -7,6 +7,7 @@ oc new-project ${MSA_PROJECT_NAME}
 
 oc adm policy add-scc-to-user privileged -z default -n ${MSA_PROJECT_NAME}
 
-oc process -f ../microservices/coolstore-msa-template.yaml | \
+cat ../microservices/coolstore-msa-template.yaml | COOLSTORE_GW_ENDPOINT=${INGRESS_URL} envsubst | \
+ oc process -f - | \
  istio-${ISTIO_VERSION}/bin/istioctl kube-inject -f - | \
  oc apply -n ${MSA_PROJECT_NAME} -f -

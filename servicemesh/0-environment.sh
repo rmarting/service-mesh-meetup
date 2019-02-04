@@ -16,8 +16,10 @@ export OS="linux" # osx | linux
 export KIALI_VERSION="v0.10.0"
 
 # Kiali - URLS for Jaeger and Grafana
-export JAEGER_URL="https://jaeger-query-istio-system.$(minishift ip).nip.io"
-export GRAFANA_URL="https://grafana-istio-system.$(minishift ip).nip.io"
+export JAEGER_URL="https://jaeger-query-${ISTIO_PROJECT_NAME}.$(minishift ip).nip.io"
+export GRAFANA_URL="https://grafana-${ISTIO_PROJECT_NAME}.$(minishift ip).nip.io"
 
 # Microservices
+export INGRESS_URL="http://istio-ingressgateway-${ISTIO_PROJECT_NAME}.$(minishift ip).nip.io"
+#export SECURE_INGRESS_URL="https://istio-ingressgateway-${ISTIO_PROJECT_NAME}.$(minishift ip).nip.io"
 export MSA_PROJECT_NAME=coolstore
