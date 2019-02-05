@@ -29,7 +29,7 @@ public class GatewayVerticle extends AbstractVerticle {
 
     @Override
     public void start() {
-
+        // Circuit Breaker Definition
         circuit = CircuitBreaker.create("inventory-circuit-breaker", vertx,
             new CircuitBreakerOptions()
                 .setFallbackOnFailure(true)
@@ -43,36 +43,46 @@ public class GatewayVerticle extends AbstractVerticle {
         router.get("/health").handler(ctx -> ctx.response().end(new JsonObject().put("status", "UP").toString()));
         router.get("/api/products").handler(this::products);
 
-        ServiceDiscovery.create(vertx, discovery -> {
-            // Catalog lookup
-            Single<WebClient> catalogDiscoveryRequest = HttpEndpoint.rxGetWebClient(discovery,
-                    rec -> rec.getName().equals("catalog"))
-                    .onErrorReturn(t -> WebClient.create(vertx, new WebClientOptions()
-                            .setDefaultHost(System.getProperty("catalog.api.host", "localhost"))
-                            .setDefaultPort(Integer.getInteger("catalog.api.port", 9000))));
-
-            // Inventory lookup
-            Single<WebClient> inventoryDiscoveryRequest = HttpEndpoint.rxGetWebClient(discovery,
-                    rec -> rec.getName().equals("inventory"))
-                    .onErrorReturn(t -> WebClient.create(vertx, new WebClientOptions()
-                            .setDefaultHost(System.getProperty("inventory.api.host", "localhost"))
-                            .setDefaultPort(Integer.getInteger("inventory.api.port", 9001))));
-
-            // Zip all 3 requests
-            Single.zip(catalogDiscoveryRequest, inventoryDiscoveryRequest, (c, i) -> {
-                // When everything is done
-                catalog = c;
-                inventory = i;
-                return vertx.createHttpServer()
-                    .requestHandler(router::accept)
-                    .listen(Integer.getInteger("http.port", 8080));
-            }).subscribe();
-        });
+        // Service Discovery is not needed when you are deploying your application on OpenShift or Kubernetes
+        // Both platforms give you a service discovery directly using Service objects.
+        // Commented this object to avoid its use
+//        ServiceDiscovery.create(vertx, discovery -> {
+//            // Catalog lookup
+//            Single<WebClient> catalogDiscoveryRequest = HttpEndpoint.rxGetWebClient(discovery,
+//                    rec -> rec.getName().equals("catalog"))
+//                    .onErrorReturn(t -> WebClient.create(vertx, new WebClientOptions()
+//                            .setDefaultHost(System.getProperty("catalog.api.host", "localhost"))
+//                            .setDefaultPort(Integer.getInteger("catalog.api.port", 9000))));
+//
+//            // Inventory lookup
+//            Single<WebClient> inventoryDiscoveryRequest = HttpEndpoint.rxGetWebClient(discovery,
+//                    rec -> rec.getName().equals("inventory"))
+//                    .onErrorReturn(t -> WebClient.create(vertx, new WebClientOptions()
+//                            .setDefaultHost(System.getProperty("inventory.api.host", "localhost"))
+//                            .setDefaultPort(Integer.getInteger("inventory.api.port", 9001))));
+//
+//            // Zip all 3 requests
+//            Single.zip(catalogDiscoveryRequest, inventoryDiscoveryRequest, (c, i) -> {
+//                // When everything is done
+//                catalog = c;
+//                inventory = i;
+//                return vertx.createHttpServer()
+//                    .requestHandler(router::accept)
+//                    .listen(Integer.getInteger("http.port", 8080));
+//            }).subscribe();
+//        });
+        
+        // Server Definition to accept request
+        vertx.createHttpServer().requestHandler(router::accept).listen(Integer.getInteger("http.port", 8080));
+        
+        // Simple Web Clients to invoke other microservices
+        catalog = WebClient.create(vertx);
+        inventory = WebClient.create(vertx);        
     }
 
     private void products(RoutingContext rc) {
         // Retrieve catalog
-        catalog.get("/api/catalog").as(BodyCodec.jsonArray()).rxSend()
+        catalog.get(8080, "catalog", "/api/catalog").as(BodyCodec.jsonArray()).rxSend()
             .map(resp -> {
                 if (resp.statusCode() != 200) {
                     new RuntimeException("Invalid response from the catalog: " + resp.statusCode());
@@ -86,7 +96,7 @@ public class GatewayVerticle extends AbstractVerticle {
                     .flatMapSingle(product ->
                         circuit.rxExecuteCommandWithFallback(
                             future ->
-                                inventory.get("/api/inventory/" + product.getString("itemId")).as(BodyCodec.jsonObject())
+                                inventory.get(8080, "inventory", "/api/inventory/" + product.getString("itemId")).as(BodyCodec.jsonObject())
                                     .rxSend()
                                     .map(resp -> {
                                         if (resp.statusCode() != 200) {
