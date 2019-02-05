@@ -72,7 +72,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 180
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           name: spring-boot
@@ -93,7 +93,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 10
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           resources: {}
@@ -159,7 +159,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 180
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           name: vertx
@@ -180,7 +180,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 10
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           resources: {}
@@ -246,7 +246,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 180
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           name: wildfly-swarm
@@ -267,7 +267,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 10
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           resources: {}
@@ -333,7 +333,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 180
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           name: wildfly-swarm
@@ -354,7 +354,7 @@ objects:
               port: 8080
               scheme: HTTP
             initialDelaySeconds: 10
-            periodSeconds: 10
+            periodSeconds: 60
             successThreshold: 1
             timeoutSeconds: 1
           resources: {}
