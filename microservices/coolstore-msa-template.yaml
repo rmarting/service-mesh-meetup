@@ -32,7 +32,7 @@ objects:
       version: 1.0.0
     name: catalog
   spec:
-    replicas: 1
+    replicas: 2
     selector:
       app: catalog
       group: com.redhat.cloudnative
@@ -291,7 +291,7 @@ objects:
       version: 2.0.0
     name: inventory-v2
   spec:
-    replicas: 1
+    replicas: 0
     selector:
       app: inventory
       group: com.redhat.cloudnative
