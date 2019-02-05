@@ -72,4 +72,4 @@ echo "Reloading base images from registry.redhat.io registry"
 oc delete is --all -n openshift
 oc apply -n openshift -f https://raw.githubusercontent.com/openshift/origin/master/examples/image-streams/image-streams-rhel7.json
 
-sleep 10
+sleep 30

@@ -1,12 +1,17 @@
 #!/bin/bash
 
 # Environment
-. ../0-environment.sh
+. ./0-environment.sh
+
+echo "Cleaning Istio Resources ..."
 
 # Cleaning resources
 oc delete virtualservice ${MSA_PROJECT_NAME}-api -n ${MSA_PROJECT_NAME}
 oc delete virtualservice ${MSA_PROJECT_NAME}-web -n ${MSA_PROJECT_NAME}
+oc delete virtualservice ${MSA_PROJECT_NAME}-inventory -n ${MSA_PROJECT_NAME}
 oc delete gateway ${MSA_PROJECT_NAME}-gateway -n ${MSA_PROJECT_NAME}
+
+echo "Creating Ingress Gateway and Virtual Services ..."
 
 # Create a gateway
 cat <<EOF | oc apply -n ${MSA_PROJECT_NAME} -f -
@@ -64,6 +69,27 @@ spec:
     route:
     - destination:
         host: web-ui
+        port:
+          number: 8080
+EOF
+
+cat <<EOF | oc apply -n ${MSA_PROJECT_NAME} -f -
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: ${MSA_PROJECT_NAME}-inventory
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - ${MSA_PROJECT_NAME}-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /api/inventory
+    route:
+    - destination:
+        host: inventory
         port:
           number: 8080
 EOF

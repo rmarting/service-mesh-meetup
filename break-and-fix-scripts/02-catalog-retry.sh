@@ -1,19 +1,19 @@
 #!/bin/bash
 
 # Environment
-. ../0-environment.sh
+. ../servicemesh/0-environment.sh
 
 # Cleaning resources
-oc delete destinationrule -n ${MSA_PROJECT_NAME} inventory
-oc delete virtualservice -n ${MSA_PROJECT_NAME} inventory
+oc delete destinationrule -n ${MSA_PROJECT_NAME} catalog
+oc delete virtualservice -n ${MSA_PROJECT_NAME} catalog-retry
 
 cat <<EOF | oc apply -n ${MSA_PROJECT_NAME} -f -
 apiVersion: networking.istio.io/v1alpha3
 kind: DestinationRule
 metadata:
-  name: inventory
+  name: catalog
 spec:
-  host: inventory
+  host: catalog
   subsets:
   - labels:
       version: 1.0.0
@@ -24,14 +24,18 @@ cat <<EOF | oc apply -n ${MSA_PROJECT_NAME} -f -
 apiVersion: networking.istio.io/v1alpha3
 kind: VirtualService
 metadata:
-  name: inventory
+  name: catalog-retry
 spec:
   hosts:
-  - inventory
+  - catalog
   http:
-  - route:
+  - retries:
+      attempts: 3
+      perTryTimeout: 5.000s
+    route:
     - destination:
-        host: inventory
+        host: catalog
         subset: version-v1
       weight: 100
 EOF
+

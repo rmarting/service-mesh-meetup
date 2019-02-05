@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Minishift
-export MINISHIFT_PROFILE="coolstoremsa"
+export MINISHIFT_PROFILE="servicemesh"
 export MINISHIFT_MEMORY="12GB"
 export MINISHIFT_CPUS="2"
 export MINISHIFT_VM_DRIVER="kvm" # xhyve | virtualbox | kvm
@@ -9,7 +9,6 @@ export MINISHIFT_DISK_SIZE="40g"
 
 # Maistra
 export MAISTRA_VERSION=0.6.0
-# export MAISTRA_VERSION=0.7
 export MAISTRA_TYPE=product # community | product
 
 # Istio
@@ -19,7 +18,7 @@ export ISTIO_SYSTEM_NAMESPACE="istio-system"
 export OS="linux" # osx | linux
 
 # Kiali
-export KIALI_VERSION=v0.12.0
+export KIALI_VERSION=v0.14.0
 export SUBDOMAIN="$(minishift ip).nip.io"
 export NAMESPACE=istio-system
 export ISTIO_NAMESPACE=istio-system
