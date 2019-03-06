@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 import rx.Observable;
 
 public class GatewayVerticle extends AbstractVerticle {
-    private static final String MSA_VERSION = "msa_version";
+    private static final String MSA_VERSION = "msa-version";
 
     private static final Logger LOG = LoggerFactory.getLogger(GatewayVerticle.class);
 
