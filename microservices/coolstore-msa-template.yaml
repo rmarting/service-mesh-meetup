@@ -401,6 +401,9 @@ objects:
         containers:
         - image: web-ui
           name: web-ui
+          env:
+            - name: COOLSTORE_GW_ENDPOINT
+              value: ${COOLSTORE_GW_ENDPOINT}
           ports:
           - containerPort: 8080
             name: http
@@ -729,4 +732,8 @@ parameters:
   displayName: ImageStream Namespace
   value: openshift
   name: IMAGE_STREAM_NAMESPACE
+  required: true
+- description: Ingress Gateway Endpoint
+  displayName: Ingress Gateway Endpoint
+  name: COOLSTORE_GW_ENDPOINT
   required: true
