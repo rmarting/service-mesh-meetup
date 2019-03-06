@@ -2,7 +2,7 @@
 
 # Minishift
 export MINISHIFT_PROFILE="servicemesh"
-export MINISHIFT_MEMORY="12GB"
+export MINISHIFT_MEMORY="9GB"
 export MINISHIFT_CPUS="2"
 export MINISHIFT_VM_DRIVER="kvm" # xhyve | virtualbox | kvm
 export MINISHIFT_DISK_SIZE="40g"
@@ -26,8 +26,6 @@ export IMAGE_NAME="${IMAGE_NAME:-kiali/kiali}"
 export IMAGE_VERSION="${IMAGE_VERSION:-$KIALI_VERSION}"
 export VERSION_LABEL="${VERSION_LABEL:-$IMAGE_VERSION}"
 export IMAGE_PULL_POLICY_TOKEN="${IMAGE_PULL_POLICY_TOKEN:-imagePullPolicy: Always}"
-export JAEGER_URL="${JAEGER_URL:-https://jaeger-query-istio-system.$SUBDOMAIN}"
-export GRAFANA_URL="${GRAFANA_URL:-http://grafana-istio-system.$SUBDOMAIN}"
 export VERBOSE_MODE="${VERBOSE_MODE:-3}"
 export KIALI_USERNAME_BASE64
 export KIALI_PASSPHRASE_BASE64
