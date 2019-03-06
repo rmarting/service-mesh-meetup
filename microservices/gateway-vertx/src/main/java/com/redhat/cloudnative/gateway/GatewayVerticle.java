@@ -47,7 +47,7 @@ public class GatewayVerticle extends AbstractVerticle {
     }
 
     private void products(RoutingContext rc) {
-        String msaVersion = rc.request().getHeader(MSA_VERSION);
+        String msaVersion = rc.request().getHeader(MSA_VERSION) == null ? "v0" : rc.request().getHeader(MSA_VERSION);
         LOG.warn("msaVersion {}", msaVersion);
         // Retrieve catalog
         catalog.get(8080, "catalog", "/api/catalog").as(BodyCodec.jsonArray()).rxSend().map(resp -> {
